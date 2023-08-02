@@ -1,0 +1,130 @@
+@mixin point-position($position, $offsetPosition) {
+  &.#{$position} {
+    #{$position}: var(--border-width);
+    #{$offsetPosition}: var(--positionOffset);
+
+    & > .callout__point {
+      border-#{opposite($position)}: calc(
+          var(--pointLength) * var(--pointLengthMultiplier)
+        )
+        solid var(--bkg-color);
+
+      &:after {
+        #{$position}: calc(var(--border-width) * -2);
+        border-#{opposite($position)}: calc(
+            var(--pointLength) * var(--pointLengthMultiplier)
+          )
+          solid var(--bdr-color);
+      }
+    }
+  }
+}
+
+@mixin border-position($direction1, $direction2) {
+  border-#{$direction1}: calc(var(--pointLength) * var(--pointWidthMultiplier))
+    solid transparent;
+  border-#{$direction2}: calc(var(--pointLength) * var(--pointWidthMultiplier))
+    solid transparent;
+
+  &:after {
+    border-#{$direction1}: calc(
+        var(--pointLength) * var(--pointWidthMultiplier)
+      )
+      solid transparent;
+    border-#{$direction2}: calc(
+        var(--pointLength) * var(--pointWidthMultiplier)
+      )
+      solid transparent;
+  }
+}
+
+.callout {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+
+  &__bubble {
+    position: relative;
+    background-color: var(--bkg-color);
+
+    border-radius: var(--corner-radius);
+
+    &.left {
+      margin-left: calc(var(--pointLength));
+    }
+
+    &.right {
+      margin-right: calc(var(--pointLength));
+    }
+
+    &.top {
+      margin-top: calc(var(--pointLength));
+    }
+
+    &.bottom {
+      margin-bottom: calc(var(--pointLength));
+    }
+
+    &:after {
+      z-index: -1;
+      content: ' ';
+      position: absolute;
+      top: calc(var(--border-width) * -1);
+      bottom: calc(var(--border-width) * -1);
+      left: calc(var(--border-width) * -1);
+      right: calc(var(--border-width) * -1);
+      background-color: var(--bdr-color);
+      border-radius: calc(var(--corner-radius) + var(--border-width));
+    }
+  }
+
+  &__content {
+    position: relative;
+    z-index: 2;
+  }
+
+  &__point-wrapper {
+    position: absolute;
+
+    &.start,
+    &.center {
+      @include point-position(left, top);
+      @include point-position(right, top);
+      @include point-position(top, left);
+      @include point-position(bottom, left);
+    }
+
+    &.end {
+      @include point-position(left, bottom);
+      @include point-position(right, bottom);
+      @include point-position(top, right);
+      @include point-position(bottom, right);
+    }
+  }
+
+  &__point {
+    &.left,
+    &.right {
+      @include border-position(top, bottom);
+
+      &:after {
+        transform: translateY(-50%);
+      }
+    }
+
+    &.top,
+    &.bottom {
+      @include border-position(right, left);
+
+      &:after {
+        transform: translateX(-50%);
+      }
+    }
+
+    &:after {
+      z-index: -1;
+      content: ' ';
+      position: absolute;
+    }
+  }
+}
